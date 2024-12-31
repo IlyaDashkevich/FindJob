@@ -1,4 +1,4 @@
-namespace JobService.Test
+namespace JobService.Test.UnitTests
 {
     public class UserUnitTest
     {
