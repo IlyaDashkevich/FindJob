@@ -10,6 +10,9 @@ builder.Services.AddScoped<IJobService, JobService.Infrastructure.Services.JobSe
 builder.Services.AddScoped<IFileService, FileService>();
 builder.Services.AddScoped<IApplicantService, ApplicantService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ICacheService, CacheService>();
+
+builder.Services.AddMemoryCache();
 
 builder.Services.AddAuthentication(options =>
 {

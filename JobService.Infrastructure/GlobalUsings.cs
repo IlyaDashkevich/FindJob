@@ -13,3 +13,7 @@ global using System.IdentityModel.Tokens.Jwt;
 global using System.Security.Claims;
 global using System.Text;
 global using Microsoft.IdentityModel.Tokens;
+global using Microsoft.Extensions.Caching.Memory;
+global using System.Runtime.Caching;
+global using MemoryCache = Microsoft.Extensions.Caching.Memory.MemoryCache;
+global using CacheItemPriority = Microsoft.Extensions.Caching.Memory.CacheItemPriority;
