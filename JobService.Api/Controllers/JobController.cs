@@ -1,14 +1,18 @@
-﻿namespace JobService.Api.Controllers;
+﻿using System.Configuration.Provider;
+
+namespace JobService.Api.Controllers;
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
     public class JobController : Controller
     {
         private readonly IJobService _jobService;
+        private readonly ICacheService _cacheService;
 
-        public JobController(IJobService jobService)
+        public JobController(IJobService jobService, ICacheService cacheService)
         {
             _jobService = jobService;
+            _cacheService = cacheService;
         }
 
         [HttpGet]
@@ -22,8 +26,17 @@
         [HttpGet("employer/{employerId}")]
         public async Task<IActionResult> GetJobsByEmployerId(int employerId)
         {
-            var jobs = await _jobService.GetJobsByEmployerId(employerId);
-            return Ok(jobs);
+            var cacheKey = $"jobs_employer_{employerId}";
+            var cachedJobs = await _cacheService.GetData<List<JobDto>>(cacheKey);
+            
+            if (cachedJobs == null)
+            {
+                var jobs = await _jobService.GetJobsByEmployerId(employerId);
+                await _cacheService.SetData(cacheKey, jobs, DateTime.UtcNow.AddMinutes(30));
+                
+                return Ok(jobs);
+            }
+            return Ok(cachedJobs);
         }
         
         [HttpGet("{id}")]
