@@ -1,6 +1,4 @@
-﻿using System.Configuration.Provider;
-
-namespace JobService.Api.Controllers;
+﻿namespace JobService.Api.Controllers;
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
@@ -42,10 +40,19 @@ namespace JobService.Api.Controllers;
         [HttpGet("{id}")]
         public async Task<IActionResult> GetJob(int id)
         {
-            var job = await _jobService.GetJob(id);
-            if (job == null) return NotFound();
+            var cacheKey = $"jobs_{id}";
+            var cachedJob = await _cacheService.GetData<JobDto>(cacheKey);
             
-            return Ok(job);  
+            if (cachedJob == null)
+            {
+                var job = await _jobService.GetJob(id);
+                if (job == null) return NotFound();
+                
+                await _cacheService.SetData(cacheKey, job, DateTime.UtcNow.AddMinutes(30));
+                
+                return Ok(job);
+            }
+            return Ok(cachedJob);  
         }
 
         [HttpPost]
